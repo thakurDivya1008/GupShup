@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import GroupModal from './GroupModal';
 import { useDispatch, useSelector } from 'react-redux'
 import dp from "../assets/dp.jpg"
 import { MdOutlinePersonSearch } from "react-icons/md";
@@ -12,6 +13,7 @@ import { setOtherUsers, setSelectedUser, setUserData } from '../redux/userSlice'
 const SideBar = () => {
     let {userData, otherUsers, selectedUser} = useSelector(state=>state.user);
     let [search, setSearch ] = useState(false);
+    let [showGroupModal, setShowGroupModal] = useState(false);
     let dispatch=useDispatch()
     let navigate = useNavigate()
      
@@ -48,6 +50,12 @@ const SideBar = () => {
             </div>
             
             <div className='w-full flex items-center gap-[20px]'>
+                <button
+                  className='bg-[#1797c2] text-white px-4 py-2 rounded mb-2 mt-2'
+                  onClick={() => setShowGroupModal(true)}
+                >
+                  + New Group
+                </button>
                 {!search && 
                  <div className=' w-[60px] h-[60px] mt-[10px] overflow-hidden rounded-full flex justify-center items-center bg-white shadow-grey-500 shadow-lg cursor-pointer' onClick={() => setSearch(true)}>
                 <MdOutlinePersonSearch className='w-[25px] h-[25px]' />
@@ -84,6 +92,18 @@ const SideBar = () => {
                     ))}
           
         </div>
+    <GroupModal
+      open={showGroupModal}
+      onClose={() => setShowGroupModal(false)}
+      onGroupCreated={(group) => {
+        // Add the new group to the conversation list (Redux or local state)
+        // If you have a conversation slice, use its addGroup action here
+        // For demo, we'll add to otherUsers as a placeholder (replace with your conversation logic)
+        dispatch(setOtherUsers([group, ...(otherUsers || [])]));
+        setShowGroupModal(false);
+      }}
+      currentUser={userData}
+    />
     </div>
   )
 }

@@ -1,8 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000", {
+export const socket = io("http://localhost:7000", {
   withCredentials: true,
-  autoConnect: false // Prevent auto-connect, connect manually in App.jsx
+  autoConnect: true
 });
-
-export default socket;

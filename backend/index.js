@@ -8,7 +8,9 @@ import connectDb from "./config/db.js";
 
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
+
 import messageRouter from "./routes/message.routes.js";
+import groupRouter from "./routes/group.routes.js";
 
 import Message from "./models/message.model.js";
 import Conversation from "./models/conversation.model.js";
@@ -19,74 +21,79 @@ const app = express();
  const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5174",
     credentials: true
   }
  });
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5174",
   credentials: true
 }));
+
+// Serve static files for uploaded images
+app.use('/public', express.static('public'));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+
 app.use("/api/message", messageRouter);
+app.use("/api/group", groupRouter);
 
 
-// io.on("connection", (socket) => {
-//   console.log("A user connected:", socket.id);
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
 
-//   socket.on("join", (userId) => {
-//     socket.join(userId);
-//     console.log(`User ${userId} joined room ${userId}`);
-//   });
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined room ${userId}`);
+  });
 
-//   socket.on("send-message", async (data) => {
-//     try {
-//       const { senderId, receiverId, message, image } = data;
+  socket.on("send-message", async (data) => {
+    try {
+      const { senderId, receiverId, message, image } = data;
 
-//       if (!senderId || !receiverId) {
-//         return socket.emit("error", "Sender and Receiver IDs are required");
-//       }
+      if (!senderId || !receiverId) {
+        return socket.emit("error", "Sender and Receiver IDs are required");
+      }
 
-//       // Save message to DB
-//       const newMessage = await Message.create({
-//         sender: senderId,
-//         receiver: receiverId,
-//         message,
-//         image,
-//       });
+      // Save message to DB
+      const newMessage = await Message.create({
+        sender: senderId,
+        receiver: receiverId,
+        message,
+        image,
+      });
 
-//       // Find or create conversation
-//       let conversation = await Conversation.findOne({
-//         participants: { $all: [senderId, receiverId] },
-//       });
+      // Find or create conversation
+      let conversation = await Conversation.findOne({
+        participants: { $all: [senderId, receiverId] },
+      });
 
-//       if (!conversation) {
-//         conversation = await Conversation.create({
-//           participants: [senderId, receiverId],
-//           messages: [newMessage._id],
-//         });
-//       } else {
-//         conversation.messages.push(newMessage._id);
-//         await conversation.save();
-//       }
+      if (!conversation) {
+        conversation = await Conversation.create({
+          participants: [senderId, receiverId],
+          messages: [newMessage._id],
+        });
+      } else {
+        conversation.messages.push(newMessage._id);
+        await conversation.save();
+      }
 
-//       io.to(senderId).to(receiverId).emit("receive-message", newMessage);
+      io.to(senderId).to(receiverId).emit("receive-message", newMessage);
 
-//     } catch (err) {
-//       console.error("Error saving message:", err.message);
-//       socket.emit("error", "Failed to send message");
-//     }
-//   });
+    } catch (err) {
+      console.error("Error saving message:", err.message);
+      socket.emit("error", "Failed to send message");
+    }
+  });
 
-//   socket.on("disconnect", () => {
-//     console.log("A user disconnected:", socket.id);
-//   });
-// });
+  socket.on("disconnect", () => {
+    console.log("A user disconnected:", socket.id);
+  });
+});
 
 
 const port = process.env.PORT || 5000;

@@ -1,3 +1,12 @@
+// Get all users (for group creation)
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, "-password");
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
 import uploadOnCloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
 

@@ -2,6 +2,28 @@ import uploadOnCloudinary from "../config/cloudinary.js";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 
+// Image upload endpoint for chat
+export const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    // If using cloudinary:
+     const result = await uploadOnCloudinary(req.file.path);
+    return res.json({ imageUrl: result.secure_url });
+
+    // If storing locally, return absolute URL
+    // const imageUrl = `${req.protocol}://${req.get('host')}/public/${req.file.filename}`;
+    // return res.json({ imageUrl });
+
+    // // If storing locally:
+    // return res.json({ imageUrl: `/public/${req.file.filename}` });
+  } catch (error) {
+    return res.status(500).json({ message: 'Image upload failed', error });
+  }
+};
+
+
 export const sendMessage = async (req, res) => {
     try {
         let sender = req.userId;
