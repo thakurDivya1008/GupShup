@@ -157,7 +157,7 @@ const MessageArea = () => {
         {!selectedUser && 
         <div className='w-full h-full flex flex-col justify-center items-center'>
           <h1 className="text-grey-700 font-bold text-[50px]">Welcome to GupShup</h1>
-          <span className='text-grey-700 font-bold text-[30px]'>Chat Friendly !</span>
+          <span className='text-grey-700 font-bold text-[30px]'>Your Space to Gup All Day!</span>
           </div>}
 
           {selectedUser &&  <div className='w-full lg:w-[70%] h-[100px] fixed bottom-[20px] flex items-center justify-center'>

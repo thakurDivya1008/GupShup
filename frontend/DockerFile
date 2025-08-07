@@ -1,0 +1,22 @@
+# Step 1: Use Node image
+FROM node:20
+
+# Step 2: Set working directory
+WORKDIR /app
+
+# Step 3: Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Step 4: Copy rest of the frontend code
+COPY . .
+
+# Step 5: Build the app
+RUN npm run build
+
+# Step 6: Serve using a lightweight server (like serve)
+RUN npm install -g serve
+EXPOSE 5174
+
+# Step 7: Serve the app
+CMD ["serve", "-s", "dist", "-l", "5174"]

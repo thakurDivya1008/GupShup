@@ -22,13 +22,13 @@ const app = express();
  const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5174",
     credentials: true
   }
  });
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5174",
   credentials: true
 }));
 
@@ -36,6 +36,11 @@ app.use(cors({
 app.use('/public', express.static('public'));
 app.use(express.json());
 app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
