@@ -1,3 +1,7 @@
+
+import uploadOnCloudinary from "../config/cloudinary.js";
+import User from "../models/user.model.js";
+
 // Get all users (for group creation)
 export const getAllUsers = async (req, res) => {
   try {
@@ -7,8 +11,6 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch users" });
   }
 };
-import uploadOnCloudinary from "../config/cloudinary.js";
-import User from "../models/user.model.js";
 
 /**
  * @desc Get the currently logged-in user's data

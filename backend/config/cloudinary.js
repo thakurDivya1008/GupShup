@@ -15,7 +15,7 @@ const uploadOnCloudinary = async (filePath) => {
   try {
     const uploadResult = await cloudinary.uploader.upload(filePath);
     fs.unlinkSync(filePath);
-    return uploadResult.secure_url;
+    return uploadResult; // Return the full result object
   } catch (error) {
     fs.unlinkSync(filePath);
     console.log("Cloudinary upload error:", error);

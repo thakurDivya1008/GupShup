@@ -1,6 +1,8 @@
 import uploadOnCloudinary from "../config/cloudinary.js";
+import fs from 'fs';
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+
 
 // Image upload endpoint for chat
 export const uploadImage = async (req, res) => {
@@ -8,20 +10,24 @@ export const uploadImage = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
-    // If using cloudinary:
-     const result = await uploadOnCloudinary(req.file.path);
+    // Upload to Cloudinary
+    const result = await uploadOnCloudinary(req.file.path);
+    // Try to delete the local file synchronously, catch EPERM errors
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (err) {
+        if (err.code !== 'ENOENT') {
+          console.warn('Failed to delete local file:', err.message);
+        }
+      }
+    }
     return res.json({ imageUrl: result.secure_url });
-
-    // If storing locally, return absolute URL
-    // const imageUrl = `${req.protocol}://${req.get('host')}/public/${req.file.filename}`;
-    // return res.json({ imageUrl });
-
-    // // If storing locally:
-    // return res.json({ imageUrl: `/public/${req.file.filename}` });
   } catch (error) {
     return res.status(500).json({ message: 'Image upload failed', error });
   }
 };
+
 
 
 export const sendMessage = async (req, res) => {
@@ -30,7 +36,7 @@ export const sendMessage = async (req, res) => {
         let { reciever } = req.params;
         let { message } = req.body;
 
-        // Debug logging
+        
         console.log('sender:', sender);
         console.log('reciever:', reciever);
         console.log('message:', message);
@@ -52,7 +58,7 @@ export const sendMessage = async (req, res) => {
 
         let newMessage = await Message.create({
             sender,
-            receiver: reciever, // fix typo to match schema
+            receiver: reciever, 
             message,
             image
         });

@@ -14,9 +14,9 @@ import SenderMessage from './SenderMessage';
 import RecieverMessage from './RecieverMessage';
 import axios from "axios"
 import { serverUrl } from '../main';
-import { setMessages, addMessage } from '../redux/messageSlice';
+import { addMessage } from '../redux/messageSlice';
 import { socket } from '../socket';
-
+import { incrementUnread, resetUnread, fetchConversations } from '../redux/conversationSlice';
 
 
 const MessageArea = () => {
@@ -90,11 +90,18 @@ const MessageArea = () => {
       }
       const handleReceiveMessage = (msg) => {
         // Only add message if it belongs to the current conversation
+        console.log('Received message:', msg);
         if (
           (msg.sender === selectedUser?._id && msg.receiver === userData._id) ||
           (msg.sender === userData._id && msg.receiver === selectedUser?._id)
         ) {
           dispatch(addMessage(msg));
+          // Reset unread for this conversation
+          dispatch(resetUnread(msg.conversationId));
+          console.log(msg.isGroup ? msg.conversationId : (msg.sender === userData._id ? msg.receiver : msg.sender));
+        } else {
+          // Refetch conversations to update unread badge in real time
+          dispatch(fetchConversations());
         }
       };
       socket.on("receive-message", handleReceiveMessage);

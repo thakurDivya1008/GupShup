@@ -11,6 +11,7 @@ import userRouter from "./routes/user.routes.js";
 
 import messageRouter from "./routes/message.routes.js";
 import groupRouter from "./routes/group.routes.js";
+import conversationRouter from "./routes/conversation.routes.js";
 
 import Message from "./models/message.model.js";
 import Conversation from "./models/conversation.model.js";
@@ -21,13 +22,13 @@ const app = express();
  const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5174",
+    origin: "http://localhost:5173",
     credentials: true
   }
  });
 
 app.use(cors({
-  origin: "http://localhost:5174",
+  origin: "http://localhost:5173",
   credentials: true
 }));
 
@@ -41,6 +42,7 @@ app.use("/api/user", userRouter);
 
 app.use("/api/message", messageRouter);
 app.use("/api/group", groupRouter);
+app.use("/api/conversation", conversationRouter);
 
 
 io.on("connection", (socket) => {
@@ -79,10 +81,23 @@ io.on("connection", (socket) => {
         });
       } else {
         conversation.messages.push(newMessage._id);
-        await conversation.save();
       }
 
-      io.to(senderId).to(receiverId).emit("receive-message", newMessage);
+      // Increment unreadCounts for all participants except sender
+      conversation.participants.forEach(userId => {
+        if (userId.toString() !== senderId) {
+          conversation.unreadCounts.set(
+            userId.toString(),
+            (conversation.unreadCounts.get(userId.toString()) || 0) + 1
+          );
+        }
+      });
+      await conversation.save();
+
+      io.to(senderId).to(receiverId).emit("receive-message", {
+        ...newMessage.toObject(),
+        conversationId: conversation._id
+      });
 
     } catch (err) {
       console.error("Error saving message:", err.message);
