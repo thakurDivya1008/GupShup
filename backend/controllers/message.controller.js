@@ -85,9 +85,13 @@ export const getMessages=async (req,res)=>{
     try {
         let sender = req.userId;
         let {reciever} = req.params
-        let conversation=await Conversation.findOne({
-            participants:{$all:[sender,reciever]}
-        }).populate("messages")
+        // reciever can be a userId (direct) or a group conversation id
+        let conversation = await Conversation.findOne({
+            $or: [
+              { participants: { $all: [sender, reciever] } },
+              { _id: reciever, isGroup: true, members: sender }
+            ]
+        }).populate({ path: "messages", select: "_id sender receiver conversation message image createdAt" })
 
         if(!conversation){
             // Return empty array if conversation not found

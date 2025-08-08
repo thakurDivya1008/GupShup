@@ -11,7 +11,8 @@ const useGetMessages = () => {
     useEffect(() => {
         const fetchMessage = async () => {
             try {
-                let result = await axios.get(`${serverUrl}/api/message/get/${selectedUser._id}`, { withCredentials: true });
+                const targetId = selectedUser._id; // group: conversation id; direct: user id
+                const result = await axios.get(`${serverUrl}/api/message/get/${targetId}`, { withCredentials: true });
                 dispatch(setMessages(result.data));
             } catch (error) {
                 console.log(error);

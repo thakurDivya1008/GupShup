@@ -8,6 +8,7 @@ import { FaImages } from 'react-icons/fa6';
 import { FaFileAlt, FaPollH } from 'react-icons/fa';
 import { RiSendPlane2Fill, RiAttachment2 } from 'react-icons/ri';
 import { FiPhone, FiVideo, FiMoreVertical } from 'react-icons/fi';
+import { RiLogoutCircleLine } from 'react-icons/ri';
 import { MdAudiotrack, MdVideoLibrary } from 'react-icons/md';
 import EmojiPicker from 'emoji-picker-react';
 import SenderMessage from './SenderMessage';
@@ -69,7 +70,9 @@ const MessageArea = () => {
         // Now emit the socket event with the image/document URL (if any)
         socket.emit("send-message", {
           senderId: userData._id,
-          receiverId: selectedUser._id,
+          receiverId: selectedUser.isGroup ? undefined : selectedUser._id,
+          conversationId: selectedUser.isGroup ? selectedUser._id : undefined,
+          isGroup: Boolean(selectedUser.isGroup),
           message: input,
           image: imageUrl,
           document: documentUrl
@@ -89,18 +92,20 @@ const MessageArea = () => {
         socket.emit("join", userData._id);
       }
       const handleReceiveMessage = (msg) => {
-        // Only add message if it belongs to the current conversation
         console.log('Received message:', msg);
-        if (
-          (msg.sender === selectedUser?._id && msg.receiver === userData._id) ||
-          (msg.sender === userData._id && msg.receiver === selectedUser?._id)
-        ) {
+        const isGroup = Boolean(selectedUser?.isGroup);
+        const sameGroup = isGroup && String(msg.conversationId) === String(selectedUser?._id);
+        const sameDirect = !isGroup && (
+          (String(msg.sender) === String(selectedUser?._id) && String(msg.receiver) === String(userData._id)) ||
+          (String(msg.sender) === String(userData._id) && String(msg.receiver) === String(selectedUser?._id))
+        );
+
+        if ((isGroup && sameGroup) || (!isGroup && sameDirect)) {
           dispatch(addMessage(msg));
-          // Reset unread for this conversation
-          dispatch(resetUnread(msg.conversationId));
-          console.log(msg.isGroup ? msg.conversationId : (msg.sender === userData._id ? msg.receiver : msg.sender));
+          if (msg.conversationId) {
+            dispatch(resetUnread(msg.conversationId));
+          }
         } else {
-          // Refetch conversations to update unread badge in real time
           dispatch(fetchConversations());
         }
       };
@@ -125,13 +130,43 @@ const MessageArea = () => {
     <IoMdArrowRoundBack className='w-[40px] h-[40px] text-white' />
   </div>
   <div className='w-[50px] h-[50px] overflow-hidden rounded-full flex justify-center items-center shadow-lg dark:shadow-xl bg-white dark:bg-slate-700'>
-    <img src={selectedUser.image || dp} alt="" className='h-[100%]' />
+    <img src={(selectedUser.isGroup ? selectedUser.groupImage : selectedUser.image) || dp} alt="" className='h-[100%]' />
   </div>
-  <h1 className='text-white font-semibold text-[20px]'>{selectedUser.name || "user"}</h1>
+  <div className='flex flex-col'>
+    <h1 className='text-white font-semibold text-[18px]'>
+      {selectedUser.isGroup ? selectedUser.groupName : (selectedUser.name || "user")}
+    </h1>
+    {selectedUser.isGroup && (
+      <div className='text-cyan-100 text-xs max-w-[60vw] whitespace-nowrap overflow-hidden text-ellipsis'>
+        {(Array.isArray(selectedUser.members) ? selectedUser.members : [])
+          .map(m => (m?.name || m?.userName))
+          .filter(Boolean)
+          .join(", ")}
+      </div>
+    )}
+  </div>
   <div className='ml-auto flex items-center gap-6'>
     <FiPhone className='w-6 h-6 text-white cursor-pointer hover:text-cyan-200 transition-colors duration-200' title="Audio Call" />
     <FiVideo className='w-6 h-6 text-white cursor-pointer hover:text-cyan-200 transition-colors duration-200' title="Video Call" />
-    <FiMoreVertical className='w-6 h-6 text-white cursor-pointer hover:text-cyan-200 transition-colors duration-200' title="More" />
+    {selectedUser.isGroup && (
+      <button
+        onClick={async () => {
+          try {
+            await axios.post(`${serverUrl}/api/group/${selectedUser._id}/leave`, {}, { withCredentials: true });
+            // After leaving, clear this chat from view
+            dispatch(setSelectedUser(null));
+            dispatch(fetchConversations());
+          } catch (err) {
+            console.error('Failed to leave group', err);
+          }
+        }}
+        className='flex items-center gap-2 text-white/90 hover:text-white text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-all'
+        title='Leave Group'
+      >
+        <RiLogoutCircleLine className='w-4 h-4' />
+        Exit
+      </button>
+    )}
   </div>
 </div>
                 <div className='w-full h-[550px] flex flex-col py-[30px] px-[20px] overflow-auto gap-[20px]'>
@@ -144,9 +179,22 @@ const MessageArea = () => {
                   </div>
                   }
 
-                  {messages && messages.map((mess)=>(
-                    mess.sender==userData._id?<SenderMessage image={mess.image} message={mess.message}/>:<RecieverMessage image={mess.image} message={mess.message}/>
-                  ))}
+                  {messages && messages.map((mess) => {
+                    const isSelf = String(mess.sender) === String(userData._id);
+                    let senderUser = null;
+                    if (selectedUser?.isGroup) {
+                      const pool = [
+                        ...(Array.isArray(selectedUser.members) ? selectedUser.members : []),
+                        ...(Array.isArray(selectedUser.participants) ? selectedUser.participants : []),
+                      ];
+                      senderUser = pool.find(u => String(u?._id || u) === String(mess.sender)) || null;
+                    }
+                    return isSelf ? (
+                      <SenderMessage key={mess._id || mess.createdAt} image={mess.image} message={mess.message} />
+                    ) : (
+                      <RecieverMessage key={mess._id || mess.createdAt} image={mess.image} message={mess.message} sender={senderUser} isGroup={Boolean(selectedUser?.isGroup)} />
+                    );
+                  })}
 
                 </div>
                 

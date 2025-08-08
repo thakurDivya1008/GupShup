@@ -60,36 +60,56 @@ io.on("connection", (socket) => {
 
   socket.on("send-message", async (data) => {
     try {
-      const { senderId, receiverId, message, image } = data;
+      const { senderId, receiverId, message, image, conversationId, isGroup } = data;
 
-      if (!senderId || !receiverId) {
-        return socket.emit("error", "Sender and Receiver IDs are required");
+      if (!senderId) {
+        return socket.emit("error", "Sender is required");
       }
 
-      // Save message to DB
-      const newMessage = await Message.create({
-        sender: senderId,
-        receiver: receiverId,
-        message,
-        image,
-      });
+      let conversation;
+      let newMessage;
 
-      // Find or create conversation
-      let conversation = await Conversation.findOne({
-        participants: { $all: [senderId, receiverId] },
-      });
-
-      if (!conversation) {
-        conversation = await Conversation.create({
-          participants: [senderId, receiverId],
-          messages: [newMessage._id],
+      if (isGroup) {
+        if (!conversationId) {
+          return socket.emit("error", "Conversation ID is required for group messages");
+        }
+        conversation = await Conversation.findById(conversationId);
+        if (!conversation || !conversation.isGroup) {
+          return socket.emit("error", "Invalid group conversation");
+        }
+        newMessage = await Message.create({
+          sender: senderId,
+          conversation: conversationId,
+          message,
+          image,
         });
-      } else {
         conversation.messages.push(newMessage._id);
+      } else {
+        if (!receiverId) {
+          return socket.emit("error", "Receiver is required for direct messages");
+        }
+        newMessage = await Message.create({
+          sender: senderId,
+          receiver: receiverId,
+          message,
+          image,
+        });
+        conversation = await Conversation.findOne({
+          participants: { $all: [senderId, receiverId] },
+        });
+        if (!conversation) {
+          conversation = await Conversation.create({
+            participants: [senderId, receiverId],
+            messages: [newMessage._id],
+          });
+        } else {
+          conversation.messages.push(newMessage._id);
+        }
       }
 
-      // Increment unreadCounts for all participants except sender
-      conversation.participants.forEach(userId => {
+      
+      const targetList = conversation.isGroup ? conversation.members : conversation.participants;
+      targetList.forEach(userId => {
         if (userId.toString() !== senderId) {
           conversation.unreadCounts.set(
             userId.toString(),
@@ -99,10 +119,19 @@ io.on("connection", (socket) => {
       });
       await conversation.save();
 
-      io.to(senderId).to(receiverId).emit("receive-message", {
-        ...newMessage.toObject(),
-        conversationId: conversation._id
-      });
+      if (conversation.isGroup) {
+        const rooms = conversation.members.map(id => id.toString());
+        // Emit to each member's room so sender also receives their own message
+        rooms.forEach(roomId => {
+          io.to(roomId).emit("receive-message", { ...newMessage.toObject(), conversationId: conversation._id, isGroup: true });
+        });
+      } else {
+        io.to(senderId).to(receiverId).emit("receive-message", {
+          ...newMessage.toObject(),
+          conversationId: conversation._id,
+          isGroup: false
+        });
+      }
 
     } catch (err) {
       console.error("Error saving message:", err.message);
