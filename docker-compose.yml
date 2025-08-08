@@ -6,10 +6,32 @@ services:
     environment:
       - PORT=7000
       - MONGODB_URL=mongodb+srv://thakurdivya220703:thakur220703@cluster0.rzmzycs.mongodb.net/GupShup?retryWrites=true&w=majority
+      - JWT_SECRET=gupshupchatapp
+      - CHOKIDAR_USEPOLLING=true
     restart: always
+    networks:
+      - app-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
 
   frontend:
     build: ./frontend
     ports:
       - "5174:5174"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     restart: always
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
+
+networks:
+  app-network:
+    driver: bridge

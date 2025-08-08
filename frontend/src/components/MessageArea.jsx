@@ -116,22 +116,22 @@ const MessageArea = () => {
     }
    
   return (
-    <div className={`lg:w-[70%] relative ${selectedUser? "flex": "hidden"} lg:flex w-full h-full bg-slate-200 border-l-2 border-grey-300`}>
+    <div className={`lg:w-[70%] relative ${selectedUser? "flex": "hidden"} lg:flex w-full h-full bg-slate-200 dark:bg-slate-900 border-l-2 border-gray-300 dark:border-gray-600 animate-slideIn`}>
 
 {selectedUser && 
 <div className='w-full h-[100vh] flex flex-col'>
-<div className='w-full h-[100px] bg-[#1797c2] rounded-b-[30px] shadow-grey-400 shadow-lg flex items-center px-[20px] gap-[20px]'>
-  <div className='cursor-pointer' onClick={()=>dispatch(setSelectedUser(null))} >
+<div className='w-full h-[100px] bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-700 dark:to-blue-700 rounded-b-[30px] shadow-lg dark:shadow-xl flex items-center px-[20px] gap-[20px]'>
+  <div className='cursor-pointer hover:bg-white/10 p-2 rounded-full transition-all duration-200' onClick={()=>dispatch(setSelectedUser(null))} >
     <IoMdArrowRoundBack className='w-[40px] h-[40px] text-white' />
   </div>
-  <div className='w-[50px] h-[50px] overflow-hidden rounded-full flex justify-center items-center shadow-grey-500 shadow-lg bg-white'>
+  <div className='w-[50px] h-[50px] overflow-hidden rounded-full flex justify-center items-center shadow-lg dark:shadow-xl bg-white dark:bg-slate-700'>
     <img src={selectedUser.image || dp} alt="" className='h-[100%]' />
   </div>
   <h1 className='text-white font-semibold text-[20px]'>{selectedUser.name || "user"}</h1>
   <div className='ml-auto flex items-center gap-6'>
-    <FiPhone className='w-6 h-6 text-white cursor-pointer hover:text-gray-200' title="Audio Call" />
-    <FiVideo className='w-6 h-6 text-white cursor-pointer hover:text-gray-200' title="Video Call" />
-    <FiMoreVertical className='w-6 h-6 text-white cursor-pointer hover:text-gray-200' title="More" />
+    <FiPhone className='w-6 h-6 text-white cursor-pointer hover:text-cyan-200 transition-colors duration-200' title="Audio Call" />
+    <FiVideo className='w-6 h-6 text-white cursor-pointer hover:text-cyan-200 transition-colors duration-200' title="Video Call" />
+    <FiMoreVertical className='w-6 h-6 text-white cursor-pointer hover:text-cyan-200 transition-colors duration-200' title="More" />
   </div>
 </div>
                 <div className='w-full h-[550px] flex flex-col py-[30px] px-[20px] overflow-auto gap-[20px]'>
@@ -155,15 +155,17 @@ const MessageArea = () => {
                }
         
         {!selectedUser && 
-        <div className='w-full h-full flex flex-col justify-center items-center'>
-          <h1 className="text-grey-700 font-bold text-[50px]">Welcome to GupShup</h1>
-          <span className='text-grey-700 font-bold text-[30px]'>Your Space to Gup All Day!</span>
+        <div className='w-full h-full relative overflow-hidden flex flex-col justify-center items-center animate-fadeIn'>
+          <img src="/chat.png" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-10 dark:opacity-20 pointer-events-none select-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-200 dark:to-slate-900 opacity-80 pointer-events-none" />
+          <h1 className="relative z-10 text-gray-700 dark:text-gray-200 font-bold text-[50px] text-center">Welcome to GupShup</h1>
+          <span className='relative z-10 text-gray-600 dark:text-gray-300 font-bold text-[30px] text-center'>Your Space to Gup All Day!</span>
           </div>}
 
           {selectedUser &&  <div className='w-full lg:w-[70%] h-[100px] fixed bottom-[20px] flex items-center justify-center'>
             <img src={frontendImage} alt="" className='w-[80px] absolute bottom-[100px] right-[20%] rounded-lg shadow-grey-400 shadow-lg'/>
 
-            <form className='w-[95%] lg:w-[70%] h-[60px] bg-[#1797c2] shadow-grey-400 shadow-lg rounded-full flex items-center gap-[20px] px-[20px] relative' onSubmit={handleSendMessage}>
+            <form className='w-[95%] lg:w-[70%] h-[60px] bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-700 dark:to-blue-700 shadow-lg dark:shadow-xl rounded-full flex items-center gap-[20px] px-[20px] relative' onSubmit={handleSendMessage}>
 
               {/* Emoji Picker */}
               <div onClick={()=> setShowPicker(prev=>!prev)}>

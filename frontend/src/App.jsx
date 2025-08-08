@@ -7,6 +7,7 @@ import {useSelector } from 'react-redux';
 import Profile from './pages/Profile';
 import Home from './pages/Home';
 import UseGetOtherUsers from './customHooks/UseGetOtherUsers';
+import { ThemeProvider } from './context/ThemeContext';
 
 
 const App = () => {
@@ -37,12 +38,14 @@ const App = () => {
   
   
   return (
-    <Routes>
-      <Route path='/login' element={!userData ? <Login /> : <Navigate to="/" />} />
-      <Route path='/signup' element={!userData ? <SignUp /> : <Navigate to="/profile" />} />
-      <Route path='/' element={userData ? <Home /> : <Navigate to="/login" />} />
-      <Route path='/profile' element={userData ? <Profile /> : <Navigate to="/signup" />} />
-    </Routes>
+    <ThemeProvider>
+      <Routes>
+        <Route path='/login' element={!userData ? <Login /> : <Navigate to="/" />} />
+        <Route path='/signup' element={!userData ? <SignUp /> : <Navigate to="/profile" />} />
+        <Route path='/' element={userData ? <Home /> : <Navigate to="/login" />} />
+        <Route path='/profile' element={userData ? <Profile /> : <Navigate to="/signup" />} />
+      </Routes>
+    </ThemeProvider>
   );
 };
 

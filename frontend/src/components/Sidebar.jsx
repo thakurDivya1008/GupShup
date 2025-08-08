@@ -12,6 +12,7 @@ import axios from 'axios';
 import { setOtherUsers, setSelectedUser, setUserData } from '../redux/userSlice';
 import { useState as useLocalState, useEffect as useLocalEffect } from 'react';
 import { fetchConversations, addConversation, resetUnread } from '../redux/conversationSlice';
+import ThemeToggle from './ThemeToggle';
 
 const SideBar = () => {
     let { userData, selectedUser } = useSelector(state=>state.user);
@@ -62,24 +63,27 @@ const SideBar = () => {
 
 
   return (
-    <div className={`lg:w-[30%] w-full h-full lg:block bg-slate-200 ${!selectedUser? "block":"hidden"}`}>
+    <div className={`lg:w-[30%] w-full h-full lg:block bg-slate-200 dark:bg-slate-800 ${!selectedUser? "block":"hidden"} animate-slideIn`}>
 
-        <div className=' w-[60px] h-[60px] mt-[10px] overflow-hidden rounded-full flex justify-center items-center bg-[#20c7ff]  shadow-grey-500 shadow-lg fixed bottom-[20px] left-[10px] cursor-pointer z-50' onClick={handleLogout}>
-                <RiLogoutCircleLine className='w-[25px] h-[25px]' />
+        <div className='w-[60px] h-[60px] mt-[10px] overflow-hidden rounded-full flex justify-center items-center bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-blue-600 shadow-lg dark:shadow-xl fixed bottom-[20px] left-[10px] cursor-pointer z-50 hover-lift' onClick={handleLogout}>
+                <RiLogoutCircleLine className='w-[25px] h-[25px] text-white' />
                 </div> 
 
-        <div className='w-full h-[300px] bg-[#20c7ff] rounded-b-[30%] shadow-grey-400 shadow-lg flex flex-col justify-center px-[20px]'>
-            <h1 className='text-white font-bold text-[25px]'>GupShup</h1>
+        <div className='w-full h-[300px] bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-blue-600 rounded-b-[30%] shadow-lg dark:shadow-xl flex flex-col justify-center px-[20px] relative'>
+            <div className='absolute top-4 right-4'>
+                <ThemeToggle />
+            </div>
+            <h1 className='text-white font-bold text-[25px] animate-fadeIn'>GupShup</h1>
             <div className='w-full flex justify-between items-center'>
-                <h1 className='text-grey-800 font-bold text-[25px]'>Hii, {userData.name || "User"}</h1>
-                <div className=' w-[60px] h-[60px] bg-white overflow-hidden rounded-full flex justify-center items-center shadow-grey-500 shadow-lg cursor-pointer' onClick={()=>navigate("/profile")}>
+                <h1 className='text-white font-bold text-[25px]'>Hi, {userData.name || "User"}</h1>
+                <div className='w-[60px] h-[60px] bg-white dark:bg-slate-700 overflow-hidden rounded-full flex justify-center items-center shadow-lg dark:shadow-xl cursor-pointer hover-lift' onClick={()=>navigate("/profile")}>
                 <img src={userData.image || dp} alt="" className='h-[100%]'/>
             </div>
             </div>
             
             <div className='w-full flex items-center gap-[20px]'>
                 <button
-                  className='flex items-center gap-2 bg-gradient-to-r from-[#1797c2] to-[#20c7ff] text-white px-4 py-2 rounded-full mb-2 mt-2 shadow-md hover:scale-105 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-[#1797c2] focus:ring-offset-2'
+                  className='flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-700 dark:to-blue-700 text-white px-4 py-2 rounded-full mb-2 mt-2 shadow-lg dark:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800'
                   onClick={() => setShowGroupModal(true)}
                   title='Create Group Chat'
                 >
@@ -87,16 +91,16 @@ const SideBar = () => {
                   <span className='font-semibold'>New Group</span>
                 </button>
                 {!search && 
-                 <div className=' w-[60px] h-[60px] mt-[10px] overflow-hidden rounded-full flex justify-center items-center bg-white shadow-grey-500 shadow-lg cursor-pointer' onClick={() => setSearch(true)}>
-                <MdOutlinePersonSearch className='w-[25px] h-[25px]' />
+                 <div className='w-[60px] h-[60px] mt-[10px] overflow-hidden rounded-full flex justify-center items-center bg-white dark:bg-slate-700 shadow-lg dark:shadow-xl cursor-pointer hover-lift' onClick={() => setSearch(true)}>
+                <MdOutlinePersonSearch className='w-[25px] h-[25px] text-gray-700 dark:text-gray-300' />
                 </div> 
                 }
 
                 {search && 
-                <form className='w-full h-[60px]  bg-white shadow-grey-500 shadow-lg flex items-center gap-[10px] mt-[10px] rounded-full overflow-hidden px-[20px]'>
-                    <MdOutlinePersonSearch className='w-[25px] h-[25px]' />
-                    <input type="text" placeholder='search users...' className='w-full h-full p-[10px] text-[17px] outline-0 border-0' />
-                    <RxCross2 className='w-[25px] h-[25px] cursor-pointer' onClick={()=>setSearch(false)}/>
+                <form className='w-full h-[60px] bg-white dark:bg-slate-700 shadow-lg dark:shadow-xl flex items-center gap-[10px] mt-[10px] rounded-full overflow-hidden px-[20px]'>
+                    <MdOutlinePersonSearch className='w-[25px] h-[25px] text-gray-700 dark:text-gray-300' />
+                    <input type="text" placeholder='search users...' className='w-full h-full p-[10px] text-[17px] outline-0 border-0 bg-transparent text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400' />
+                    <RxCross2 className='w-[25px] h-[25px] cursor-pointer text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200' onClick={()=>setSearch(false)}/>
                     </form>}
                 
                 {/* {!search && otherUsers?.map((user)=>(
@@ -117,11 +121,11 @@ const SideBar = () => {
             name: c.isGroup ? c.groupName : 'direct',
             participants: c.participants 
           })))}
-          {conversations.length === 0 && <div className='text-center text-gray-400'>No conversations found.</div>}
+          {conversations.length === 0 && <div className='text-center text-gray-400 dark:text-gray-500 animate-fadeIn'>No conversations found.</div>}
           {conversations.map(conv => (
             <div
               key={conv._id}
-              className='w-[95%] h-[60px] flex justify-start items-center gap-[20px] bg-white shadow-grey-500 shadow-lg rounded-full hover:bg-[#b2ccdf] cursor-pointer relative'
+              className='w-[95%] h-[60px] flex justify-start items-center gap-[20px] bg-white dark:bg-slate-700 shadow-lg dark:shadow-xl rounded-full hover:bg-cyan-50 dark:hover:bg-slate-600 cursor-pointer relative hover-lift transition-all duration-300'
               onClick={async () => {
                 dispatch(setSelectedUser(conv.isGroup ? conv : getOtherUser(conv, userData)));
                 try {
@@ -132,18 +136,18 @@ const SideBar = () => {
                 }
               }}
             >
-              <div className='w-[60px] h-[60px] overflow-hidden rounded-full flex justify-center items-center shadow-grey-500 shadow-lg bg-white'>
+              <div className='w-[60px] h-[60px] overflow-hidden rounded-full flex justify-center items-center shadow-lg dark:shadow-xl bg-white dark:bg-slate-600'>
                 {conv.isGroup ? (
                   <img src={conv.groupImage || dp} alt='' className='h-[100%]' />
                 ) : (
                   <img src={(getOtherUser(conv, userData).image) || dp} alt='' className='h-[100%]' />
                 )}
               </div>
-              <h1 className='text-grey-800 font-semibold text-[20px]'>
+              <h1 className='text-gray-800 dark:text-gray-200 font-semibold text-[20px]'>
                 {conv.isGroup ? conv.groupName : (getOtherUser(conv, userData).name || getOtherUser(conv, userData).userName)}
               </h1>
               {conv.unread > 0 && (
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 bg-green-500 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 bg-green-500 dark:bg-green-400 text-white dark:text-gray-900 rounded-full px-2 py-0.5 text-xs font-bold shadow animate-pulse">
                   {conv.unread}
                 </span>
               )}

@@ -4,6 +4,7 @@ import { serverUrl } from '../main';
 import axios from 'axios';
 import { useDispatch} from 'react-redux';
 import { setUserData } from '../redux/userSlice';
+import ThemeToggle from '../components/ThemeToggle';
 
 const SignUp = () => {
     let navigate = useNavigate();
@@ -39,25 +40,28 @@ const SignUp = () => {
         }
     }
   return (
-    <div className='w-full h-[100vh] bg-slate-200 flex items-center justify-center'>
-        <div className='w-full max-w-[500px] h-[600px] bg-white rounded-lg shadow-grey-400 shadow-lg flex flex-col gap-[30px]'>
-            <div className='w-full h-[200px] bg-[#20c7ff] rounded-b-[30%] shadow-grey-400 shadow-lg flex items-center justify-center'>
-                <h1 className='text-grey-600 font-bold text-[30px]'>Welcome to <span className='text-white'>GupShup</span></h1>
+    <div className='w-full h-[100vh] bg-slate-200 dark:bg-slate-900 flex items-center justify-center animate-fadeIn'>
+        <div className='w-full max-w-[500px] h-[600px] bg-white dark:bg-slate-800 rounded-lg shadow-lg dark:shadow-2xl flex flex-col gap-[30px] hover-lift'>
+            <div className='w-full h-[200px] bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-blue-600 rounded-b-[30%] shadow-lg flex items-center justify-center relative'>
+                <div className='absolute top-4 right-4'>
+                    <ThemeToggle />
+                </div>
+                <h1 className='text-white font-bold text-[30px] animate-fadeIn'>Welcome to <span className='text-cyan-200'>GupShup</span></h1>
             </div>
             <form className='w-full flex flex-col gap-[20px] items-center' onSubmit={handleSignUp}>
                 <input type="text" placeholder='username'
-                className='w-[90%] h-[50px] outline-none border-2 border-[#20c7ff] px-[20px] py-[10px] bg-white rounded-lg  shadow-grey-400 shadow-lg text-grey-700 text-[19px]' onChange={(e)=>setUserName(e.target.value)} value={userName}/>
+                className='w-[90%] h-[50px] outline-none border-2 border-cyan-500 dark:border-cyan-400 px-[20px] py-[10px] bg-white dark:bg-slate-700 rounded-lg shadow-lg dark:shadow-xl text-gray-700 dark:text-gray-200 text-[19px] focus:border-cyan-600 dark:focus:border-cyan-300 transition-all duration-300' onChange={(e)=>setUserName(e.target.value)} value={userName}/>
 
-                <input type="email" placeholder='email' className='w-[90%] h-[50px] outline-none border-2 border-[#20c7ff] px-[20px] py-[10px] bg-white rounded-lg  shadow-grey-400 shadow-lg text-grey-700 text-[19px]' onChange={(e)=>setEmail(e.target.value)} value={email}/>
+                <input type="email" placeholder='email' className='w-[90%] h-[50px] outline-none border-2 border-cyan-500 dark:border-cyan-400 px-[20px] py-[10px] bg-white dark:bg-slate-700 rounded-lg shadow-lg dark:shadow-xl text-gray-700 dark:text-gray-200 text-[19px] focus:border-cyan-600 dark:focus:border-cyan-300 transition-all duration-300' onChange={(e)=>setEmail(e.target.value)} value={email}/>
 
-                <div className='w-[90%] h-[50px] border-2 border-[#20c7ff] overflow-hidden rounded-lg shadow-grey-200 shadow-lg relative'>
-                    <input type={`${show?"text":"password"}`} placeholder='password' className=' w-full h-full outline-none px-[20px] py-[10px] bg-[white] text-grey-700 text-[19px]'  onChange={(e)=>setPassword(e.target.value)} value={password}/>
-                    <span className='absolute top-[10px] right-[20px] text-[19px] text-[#20c7ff] font-semibold cursor-pointer' onClick={() => setShow(prev=>!prev)}>{`${show?"hidden":"show"}`}</span>
+                <div className='w-[90%] h-[50px] border-2 border-cyan-500 dark:border-cyan-400 overflow-hidden rounded-lg shadow-lg dark:shadow-xl relative'>
+                    <input type={`${show?"text":"password"}`} placeholder='password' className='w-full h-full outline-none px-[20px] py-[10px] bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-[19px] focus:border-cyan-600 dark:focus:border-cyan-300 transition-all duration-300'  onChange={(e)=>setPassword(e.target.value)} value={password}/>
+                    <span className='absolute top-[10px] right-[20px] text-[19px] text-cyan-500 dark:text-cyan-400 font-semibold cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 transition-colors duration-200' onClick={() => setShow(prev=>!prev)}>{`${show?"hidden":"show"}`}</span>
                 </div>
                 
-       {err && <p className='text-red-500'>{err}</p>}
-                <button className='px-[20px] py-[10px] bg-[#20c7ff] rounded-2xl shadow-grey-400 shadow-lg text-[20px] w-[200px] mt-[20px]font-semibold hover:shadow-inner' disabled={loading}>{loading?"Loading...":"sign up"}</button>
-                <p className='cursor-pointer' onClick={()=>navigate("/login")}>Already Have an Account ? <span className='text-[#20c7ff]'>Login</span></p>
+       {err && <p className='text-red-500 dark:text-red-400 animate-pulse'>{err}</p>}
+                <button className='w-[90%] h-[50px] bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-blue-600 text-white font-semibold text-[19px] rounded-lg shadow-lg dark:shadow-xl hover:from-cyan-600 hover:to-blue-600 dark:hover:from-cyan-700 dark:hover:to-blue-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed' disabled={loading}>{loading?"Loading...":"sign up"}</button>
+                <p className='text-gray-700 dark:text-gray-300 text-[16px] cursor-pointer' onClick={()=>navigate("/login")}>Already Have an Account ? <span className='text-cyan-500 dark:text-cyan-400 font-semibold hover:underline hover:text-cyan-600 dark:hover:text-cyan-300 transition-colors duration-200'>Login</span></p>
             </form>
         </div>
 

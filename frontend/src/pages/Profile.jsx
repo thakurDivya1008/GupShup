@@ -55,18 +55,18 @@ const handleProfile= async (e) => {
 }
 
   return (
-    <div className='w-full h-[100vh] bg-slate-200 flex flex-col justify-center items-center gap-[20px]'>
+    <div className='w-full h-[100vh] bg-slate-200 dark:bg-slate-900 flex flex-col justify-center items-center gap-[20px] animate-fadeIn'>
 
-      <div className='fixed top-[20px] left-[20px] cursor-pointer' onClick={()=>navigate("/")}>
-        <IoMdArrowRoundBack className='w-[50px] h-[50px] text-grey-600' />
+      <div className='fixed top-[20px] left-[20px] cursor-pointer hover:bg-white/10 p-2 rounded-full transition-all duration-200' onClick={()=>navigate("/")}>
+        <IoMdArrowRoundBack className='w-[50px] h-[50px] text-gray-600 dark:text-gray-300' />
       </div>
 
-        <div className=' bg-white rounded-full border-4 border-[#20c7ff] shadow-lg relative' onClick={() => image.current.click()}>
-            <div className=' w-[200px] h-[200px] overflow-hidden rounded-full flex justify-center items-center'>
+        <div className='bg-white dark:bg-slate-700 rounded-full border-4 border-cyan-500 dark:border-cyan-400 shadow-lg dark:shadow-xl relative hover-lift' onClick={() => image.current.click()}>
+            <div className='w-[200px] h-[200px] overflow-hidden rounded-full flex justify-center items-center'>
                 <img src={frontendImage} alt="" className='h-[100%]'/>
             </div>
-            <div className='absolute bottom-4 text-grey-700 right-4 w-[35px] h-[35px] bg-[#20c7ff] flex justify-center items-center shadow-grey-400 shadow-lg'>
-              <IoCameraOutline className='text-grey-700 w-[25px] h-[25px]'/>
+            <div className='absolute bottom-4 right-4 w-[35px] h-[35px] bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-blue-600 flex justify-center items-center shadow-lg dark:shadow-xl rounded-full'>
+              <IoCameraOutline className='text-white w-[25px] h-[25px]'/>
             </div>
            
 
@@ -76,14 +76,14 @@ const handleProfile= async (e) => {
 
           <input type="file" accept='image/*' ref={image} hidden onChange={handleImage}/>
 
-          <input type="text" placeholder='Enter your name' className='w-[90%] h-[50px] outline-none border-2 border-[#20c7ff] px-[20px] py-[10px] bg-white rounded-lg  shadow-grey-400 shadow-lg text-grey-400 text-[19px]' onChange={(e)=>setName(e.target.value)} value={name}/>
+          <input type="text" placeholder='Enter your name' className='w-[90%] h-[50px] outline-none border-2 border-cyan-500 dark:border-cyan-400 px-[20px] py-[10px] bg-white dark:bg-slate-700 rounded-lg shadow-lg dark:shadow-xl text-gray-700 dark:text-gray-200 text-[19px] focus:border-cyan-600 dark:focus:border-cyan-300 transition-all duration-300' onChange={(e)=>setName(e.target.value)} value={name}/>
 
 
-          <input type="text" readOnly className='w-[90%] h-[50px] outline-none border-2 border-[#20c7ff] px-[20px] py-[10px] bg-white rounded-lg  shadow-grey-400 shadow-lg text-grey-400 text-[19px]' value={userData?.userName}/>
+          <input type="text" readOnly className='w-[90%] h-[50px] outline-none border-2 border-cyan-500 dark:border-cyan-400 px-[20px] py-[10px] bg-white dark:bg-slate-700 rounded-lg shadow-lg dark:shadow-xl text-gray-700 dark:text-gray-200 text-[19px]' value={userData?.userName}/>
 
-          <input type="text" readOnly  className='w-[90%] h-[50px] outline-none border-2 border-[#20c7ff] px-[20px] py-[10px] bg-white rounded-lg  shadow-grey-400 shadow-lg text-grey-400 text-[19px]' value={userData?.email}/>
+          <input type="text" readOnly  className='w-[90%] h-[50px] outline-none border-2 border-cyan-500 dark:border-cyan-400 px-[20px] py-[10px] bg-white dark:bg-slate-700 rounded-lg shadow-lg dark:shadow-xl text-gray-700 dark:text-gray-200 text-[19px]' value={userData?.email}/>
 
-          <button className='px-[20px] py-[10px] bg-[#20c7ff] rounded-2xl shadow-grey-400 shadow-lg text-[20px] w-[200px] mt-[20px]font-semibold hover:shadow-inner' disabled={saving}>{saving?"saving..." : "Save Profile"}</button>
+          <button className='w-[90%] h-[50px] bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-blue-600 text-white font-semibold text-[19px] rounded-lg shadow-lg dark:shadow-xl hover:from-cyan-600 hover:to-blue-600 dark:hover:from-cyan-700 dark:hover:to-blue-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed' disabled={saving}>{saving?"saving..." : "Save Profile"}</button>
         </form>
     </div>
   )

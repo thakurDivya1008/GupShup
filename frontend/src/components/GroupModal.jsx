@@ -63,16 +63,16 @@ const GroupModal = ({ open, onClose, onGroupCreated, currentUser }) => {
   console.log("users", users, "currentUser", currentUser);
 
   return (
-    <div className="fixed inset-0  bg-slate-300 bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-slate-300 dark:bg-slate-900 bg-opacity-40 dark:bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn">
       <form
-        className="bg-white border-2 border-[#1797c2] shadow-2xl rounded-2xl w-[370px] flex flex-col gap-5 p-7 animate-fadeIn"
+        className="bg-white dark:bg-slate-800 border-2 border-cyan-500 dark:border-cyan-400 shadow-2xl dark:shadow-3xl rounded-2xl w-[370px] flex flex-col gap-5 p-7 animate-fadeIn hover-lift"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-bold mb-1 text-[#1797c2] text-center tracking-wide">Create Group</h2>
+        <h2 className="text-2xl font-bold mb-1 text-cyan-600 dark:text-cyan-400 text-center tracking-wide">Create Group</h2>
         <input
           type="text"
           placeholder="Group Name"
-          className="border-2 border-[#1797c2] focus:border-[#20c7ff] p-2 rounded-lg outline-none text-lg transition-all"
+          className="border-2 border-cyan-500 dark:border-cyan-400 focus:border-cyan-600 dark:focus:border-cyan-300 p-2 rounded-lg outline-none text-lg transition-all bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
           value={groupName}
           onChange={e => setGroupName(e.target.value)}
           required
@@ -83,14 +83,14 @@ const GroupModal = ({ open, onClose, onGroupCreated, currentUser }) => {
             <img
               src={URL.createObjectURL(groupImage)}
               alt="Group Preview"
-              className="w-16 h-16 rounded-full object-cover border-2 border-[#1797c2] shadow"
+              className="w-16 h-16 rounded-full object-cover border-2 border-cyan-500 dark:border-cyan-400 shadow-lg dark:shadow-xl"
             />
           )}
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:bg-[#1797c2] file:text-white file:font-semibold file:cursor-pointer bg-slate-100 rounded-lg"
+            className="file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:bg-cyan-500 dark:file:bg-cyan-600 file:text-white file:font-semibold file:cursor-pointer bg-slate-100 dark:bg-slate-700 rounded-lg text-gray-700 dark:text-gray-200"
           />
         </div>
         <div className="max-h-40 overflow-y-auto border border-[#b2ccdf] rounded-lg p-2 bg-slate-50">
