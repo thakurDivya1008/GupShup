@@ -21,7 +21,7 @@ export const getCurrentUser = async (req, res) => {
   try {
 
     console.log("Inside getCurrentUser");
-    console.log("req.userId:", req.userId); // ⬅️ ADD THIS
+    console.log("req.userId:", req.userId); 
     const userId = req.userId;
     console.log("Fetching current user with ID:", userId);
 
