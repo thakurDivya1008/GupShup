@@ -87,6 +87,7 @@ io.on("connection", (socket) => {
           conversation: conversationId,
           message,
           image,
+          seen: [] // Ensure seen is empty on creation
         });
         conversation.messages.push(newMessage._id);
       } else {
@@ -98,6 +99,7 @@ io.on("connection", (socket) => {
           receiver: receiverId,
           message,
           image,
+          seen: [] // Ensure seen is empty on creation
         });
         conversation = await Conversation.findOne({
           participants: { $all: [senderId, receiverId] },
@@ -128,19 +130,40 @@ io.on("connection", (socket) => {
         const rooms = conversation.members.map(id => id.toString());
         // Emit to each member's room so sender also receives their own message
         rooms.forEach(roomId => {
-          io.to(roomId).emit("receive-message", { ...newMessage.toObject(), conversationId: conversation._id, isGroup: true });
+          io.to(roomId).emit("receive-message", { ...newMessage.toObject(), conversationId: conversation._id, isGroup: true, seen: (newMessage.seen || []).map(id => id.toString()) });
         });
       } else {
         io.to(senderId).to(receiverId).emit("receive-message", {
           ...newMessage.toObject(),
           conversationId: conversation._id,
-          isGroup: false
+          isGroup: false,
+          seen: (newMessage.seen || []).map(id => id.toString())
         });
       }
 
     } catch (err) {
       console.error("Error saving message:", err.message);
       socket.emit("error", "Failed to send message");
+    }
+  });
+
+  socket.on("message:seen", async ({ messageIds, userId }) => {
+    try {
+      if (!Array.isArray(messageIds) || !userId) return;
+      // Update all messages to add userId to seen array if not already present
+      await Promise.all(messageIds.map(async (msgId) => {
+        const msg = await Message.findById(msgId);
+        if (msg && !msg.seen.includes(userId)) {
+          msg.seen.push(userId);
+          await msg.save();
+          // Notify sender (if not the same as the viewer)
+          if (msg.sender.toString() !== userId) {
+            io.to(msg.sender.toString()).emit("message:seen:update", { messageId: msgId, seenBy: userId });
+          }
+        }
+      }));
+    } catch (err) {
+      console.error("Error updating seen status:", err.message);
     }
   });
 

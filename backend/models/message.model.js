@@ -25,6 +25,11 @@ const messageSchema= new mongoose.Schema({
     image:{
         type:String,
        default:""
+    },
+    seen: {
+        type: [mongoose.Schema.Types.ObjectId], // Array of user IDs who have seen the message
+        ref: 'User',
+        default: [],
     }
 
 

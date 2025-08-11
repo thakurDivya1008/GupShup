@@ -34,6 +34,29 @@ const MessageArea = () => {
 
     let image = useRef()
     let {messages} = useSelector(state=>state.message);
+    // Modal state for full-screen image
+    const [modalImage, setModalImage] = useState(null);
+
+    
+    useEffect(() => {
+      if (!messages || !userData?._id) return;
+      const unseen = messages.filter(m => Array.isArray(m.seen) && !m.seen.includes(userData._id) && String(m.sender) !== String(userData._id));
+      if (unseen.length > 0) {
+        const messageIds = unseen.map(m => m._id);
+        socket.emit('message:seen', { messageIds, userId: userData._id });
+      }
+    }, [messages, userData]);
+
+    // Listen for message:seen:update to update message state
+    useEffect(() => {
+      const handleSeenUpdate = ({ messageId, seenBy }) => {
+        dispatch(addMessage({ _id: messageId, seen: [seenBy] })); // This assumes addMessage merges seen array
+      };
+      socket.on('message:seen:update', handleSeenUpdate);
+      return () => {
+        socket.off('message:seen:update', handleSeenUpdate);
+      };
+    }, [dispatch]);
 
 
     const handleImage = (e) => {
@@ -190,9 +213,25 @@ const MessageArea = () => {
                       senderUser = pool.find(u => String(u?._id || u) === String(mess.sender)) || null;
                     }
                     return isSelf ? (
-                      <SenderMessage key={mess._id || mess.createdAt} image={mess.image} message={mess.message} />
+                      <SenderMessage 
+                        key={mess._id || mess.createdAt} 
+                        image={mess.image} 
+                        message={mess.message} 
+                        seen={mess.seen} 
+                        onImageClick={setModalImage} 
+                        currentUserId={userData._id}
+                        createdAt={mess.createdAt}
+                      />
                     ) : (
-                      <RecieverMessage key={mess._id || mess.createdAt} image={mess.image} message={mess.message} sender={senderUser} isGroup={Boolean(selectedUser?.isGroup)} />
+                      <RecieverMessage 
+                        key={mess._id || mess.createdAt} 
+                        image={mess.image} 
+                        message={mess.message} 
+                        sender={senderUser} 
+                        isGroup={Boolean(selectedUser?.isGroup)} 
+                        onImageClick={setModalImage}
+                        createdAt={mess.createdAt}
+                      />
                     );
                   })}
 
@@ -259,8 +298,20 @@ const MessageArea = () => {
 
             </div>  }
 
-
-              
+        {/* Full-screen image modal */}
+        {modalImage && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80" onClick={() => setModalImage(null)}>
+            <button
+              className="absolute top-6 right-8 text-white text-3xl font-bold bg-black/60 rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/80 z-60"
+              style={{zIndex: 60}}
+              onClick={e => { e.stopPropagation(); setModalImage(null); }}
+              aria-label="Close image modal"
+            >
+              &times;
+            </button>
+            <img src={modalImage} alt="Full" className="max-w-full max-h-full rounded-lg shadow-2xl" />
+          </div>
+        )}
     </div>
   )
 }
