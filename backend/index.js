@@ -15,6 +15,8 @@ import conversationRouter from "./routes/conversation.routes.js";
 
 import Message from "./models/message.model.js";
 import Conversation from "./models/conversation.model.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerFile from "./swagger-output.json" assert { type: "json" };
 
 dotenv.config();
 
@@ -31,6 +33,9 @@ app.use(cors({
   origin: ["http://localhost:5174", "http://127.0.0.1:5174"],
   credentials: true
 }));
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // Serve static files for uploaded images
 app.use('/public', express.static('public'));
