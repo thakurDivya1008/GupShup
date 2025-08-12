@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import connectDb from "./config/db.js";
+import  {sub}  from "./config/redis.js";
 
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
@@ -54,6 +55,14 @@ app.use("/api/message", messageRouter);
 app.use("/api/group", groupRouter);
 app.use("/api/conversation", conversationRouter);
 
+sub.subscribe('chat:messages');
+sub.on('message', (channel, message) => {
+  if (channel === 'chat:messages') {
+    const msg = JSON.parse(message);
+    console.log('Received new message via Redis Pub/Sub:', msg);
+    // You can broadcast to WebSocket clients here if needed
+  }
+});
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);

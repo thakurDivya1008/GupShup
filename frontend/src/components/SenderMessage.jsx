@@ -2,7 +2,7 @@ import React from 'react'
 import { formatTimestamp } from '../utils/dateUtils'
 
 const SenderMessage = ({ image, message, seen, onImageClick, currentUserId, createdAt }) => {
-  // Show blue double tick only if someone other than the sender has seen
+  
   const isSeenByOther = Array.isArray(seen) && seen.some(uid => String(uid) !== String(currentUserId));
   let tick;
   if (isSeenByOther) {
@@ -16,7 +16,7 @@ const SenderMessage = ({ image, message, seen, onImageClick, currentUserId, crea
       {image && <img src={image} alt="" className='w-[100px] rounded-lg shadow-md cursor-pointer' onClick={() => onImageClick && onImageClick(image)} />}
       {message && <span className='text-sm'>{message}</span>}
       <div className="flex justify-end items-center gap-2 mt-1">
-        <span className="text-xs opacity-70">{formatTimestamp(createdAt)}</span>
+        <span className="text-xs opacity-50">{formatTimestamp(createdAt)}</span>
         {tick}
       </div>
     </div>

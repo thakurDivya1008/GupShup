@@ -2,6 +2,7 @@ import uploadOnCloudinary from "../config/cloudinary.js";
 import fs from 'fs';
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import {pub}  from "../config/redis.js";
 
 
 // Image upload endpoint for chat
@@ -72,6 +73,9 @@ export const sendMessage = async (req, res) => {
             conversation.messages.push(newMessage._id);
             await conversation.save();
         }
+
+        // Publish the new message to Redis channel
+        await pub.publish('chat:messages', JSON.stringify(newMessage));
 
         return res.status(201).json(newMessage);
     } catch (error) {

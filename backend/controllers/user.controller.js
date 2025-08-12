@@ -1,6 +1,7 @@
 
 import uploadOnCloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
+import { redis }from "../config/redis.js";
 
 // Get all users (for group creation)
 export const getAllUsers = async (req, res) => {
@@ -25,12 +26,19 @@ export const getCurrentUser = async (req, res) => {
     const userId = req.userId;
     console.log("Fetching current user with ID:", userId);
 
+    const cacheKey = `user:${userId}`;
+    const cachedUser = await redis.get(cacheKey);
+    if (cachedUser) {
+      return res.status(200).json(JSON.parse(cachedUser));
+    }
+
     const user = await User.findById(userId).select("-password");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    await redis.set(cacheKey, JSON.stringify(user), "EX", 3600); // Cache for 1 hour
     return res.status(200).json(user);
   } catch (error) {
     console.error("GetCurrentUser Error:", error);

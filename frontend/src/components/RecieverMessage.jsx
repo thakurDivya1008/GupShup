@@ -2,7 +2,7 @@ import React from 'react'
 import dp from "../assets/dp.jpg"
 import { formatTimestamp } from '../utils/dateUtils'
 
-// For non-self messages; shows sender avatar/name in group chats (WhatsApp-like)
+
 const RecieverMessage = ({ image, message, sender, isGroup = false, onImageClick, createdAt }) => {
   const avatar = sender?.image || dp;
   const displayName = sender?.name || sender?.userName || (isGroup ? 'Member' : '');
@@ -22,7 +22,7 @@ const RecieverMessage = ({ image, message, sender, isGroup = false, onImageClick
         {image && <img src={image} alt="" className='w-[120px] rounded-lg shadow-md cursor-pointer' onClick={() => onImageClick && onImageClick(image)} />}
         {message && <span className='text-sm leading-5'>{message}</span>}
         <div className="flex justify-start items-center mt-1">
-          <span className="text-xs opacity-70">{formatTimestamp(createdAt)}</span>
+          <span className="text-xs opacity-50">{formatTimestamp(createdAt)}</span>
         </div>
       </div>
     </div>

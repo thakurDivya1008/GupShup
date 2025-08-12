@@ -11,12 +11,12 @@ const isAuth = async (req, res, next) => {
       return res.status(400).json({ message: "Token not found" });
     }
 
-    // ✅ Correct usage of jwt.verify
+    
     const verifyToken = jwt.verify(token, process.env.JWT_SECRET);
     console.log("Verified token payload:", verifyToken);
 
-    // ✅ Make sure you're using the same key structure when signing the token
-    req.userId = verifyToken.id; // Token is created with {id: userId}, so access verifyToken.id
+    
+    req.userId = verifyToken.id; 
     console.log("Set req.userId to:", req.userId);
 
     next();
