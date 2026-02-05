@@ -17,7 +17,8 @@ import conversationRouter from "./routes/conversation.routes.js";
 import Message from "./models/message.model.js";
 import Conversation from "./models/conversation.model.js";
 import swaggerUi from "swagger-ui-express";
-import swaggerFile from "./swagger-output.json" assert { type: "json" };
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -36,7 +37,18 @@ app.use(cors({
 }));
 
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+// Load swagger docs if generated; otherwise skip to avoid crash
+try {
+  const swaggerJsonPath = fileURLToPath(new URL('./swagger-output.json', import.meta.url));
+  if (fs.existsSync(swaggerJsonPath)) {
+    const swaggerFile = JSON.parse(fs.readFileSync(swaggerJsonPath, 'utf-8'));
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+  } else {
+    console.warn('swagger-output.json not found — /api-docs disabled. Run the swagger generator to enable docs.');
+  }
+} catch (err) {
+  console.warn('Failed to load swagger docs:', err.message);
+}
 
 // Serve static files for uploaded images
 app.use('/public', express.static('public'));

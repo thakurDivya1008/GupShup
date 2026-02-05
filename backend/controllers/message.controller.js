@@ -13,14 +13,14 @@ export const uploadImage = async (req, res) => {
     }
     // Upload to Cloudinary
     const result = await uploadOnCloudinary(req.file.path);
-    // Try to delete the local file synchronously, catch EPERM errors
+    // Try to delete the local file synchronously, check if it exists first
     if (req.file && req.file.path) {
       try {
-        fs.unlinkSync(req.file.path);
-      } catch (err) {
-        if (err.code !== 'ENOENT') {
-          console.warn('Failed to delete local file:', err.message);
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
         }
+      } catch (err) {
+        console.warn('Failed to delete local file after Cloudinary upload:', err.message);
       }
     }
     return res.json({ imageUrl: result.secure_url });
@@ -51,6 +51,14 @@ export const sendMessage = async (req, res) => {
         let image;
         if (req.file) {
             image = await uploadOnCloudinary(req.file.path);
+            // Clean up local file after Cloudinary upload
+            try {
+              if (fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+              }
+            } catch (err) {
+              console.warn('Failed to delete local file after Cloudinary upload:', err.message);
+            }
         }
 
         let conversation = await Conversation.findOne({
